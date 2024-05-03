@@ -4,27 +4,27 @@ Splicing
 APC Build
 ---------
 
-+ Short genes < 1200 bp for the chromosomal region (<1000 bp transcript)
++ Isolated protein-coding genes that do no overlap other genes
++ Genes must have an intron
 + Have a single annotated isoform (no argument about which one is canonical)
-+ Contain at least 1 intron in transcript
-+ Have only 1 annotated isoform
-+ Have no more than 3 introns
-+ Moderately expressed region: RNASeq_splice > 100,000
-+ No short introns (<35)
-+ No short exons (<25)
-+ No non-coding RNA genes
-+ Not too many possible isoforms (1e6)
-
-These criteria above are the defaults in `apc_build`
++ Genes must have at least 100,000 RNAseq introns matching the annotation
++ No non-canonical gene features
+	+ GT..AG introns only
+	+ Exons >= 25 bp
+	+ Introns >= 35 bp
++ The primary transcript must be less than 1000 bp
++ The transcript must have at most 3 introns
++ The gene must have less than 1 million putative isoforms
 
 
 Stuff you need
 
-+ grimoire for `haman`
-+ genomikon for `isocounter`
-+ executables and libraries in proper paths...
++ grimoire in your PYTHONPATH
++ grimoire's `haman` in your PATH
++ genomikon's `isocounter` in your PATH
 
-Requires doing a C.elegans gene build with --issuesok
+Requires doing a C.elegans gene build with `--issuesok`. In the lines below,
+`$DATA` is wherever you keep your data.
 
 	mkdir build
 	cd build
@@ -38,6 +38,9 @@ Requires doing a C.elegans gene build with --issuesok
 2 new files: `apc.genes.txt` and `apc.log.json`
 
 	mkdir apc
+	mv genes build
 	perl gather.pl apc.genes.txt
 	tar -zcf apc.tar.gz apc
 	mv apc build
+
+The apc set for ws282 is ___ genes.
