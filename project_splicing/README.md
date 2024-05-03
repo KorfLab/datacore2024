@@ -7,6 +7,7 @@ APC Build
 + Short genes < 1200 bp for the chromosomal region (<1000 bp transcript)
 + Have a single annotated isoform (no argument about which one is canonical)
 + Contain at least 1 intron in transcript
++ Have only 1 annotated isoform
 + Have no more than 3 introns
 + Moderately expressed region: RNASeq_splice > 100,000
 + No short introns (<35)
@@ -32,7 +33,7 @@ Requires doing a C.elegans gene build with --issuesok
 	gunzip -c gff3.gz | grep -E "WormBase|RNASeq" > ws282.gff3
 	cd ..
 	haman build/genome.gz build/ws282.gff3 pcg genes --issuesok
-	./apc_build build/genes
+	./apc_build genes
 
 2 new files: `apc.genes.txt` and `apc.log.json`
 
