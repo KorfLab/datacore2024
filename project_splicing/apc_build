@@ -20,10 +20,8 @@ parser.add_argument('genes', type=str, metavar='<genes dir>',
 	help='path to gene build directory')
 parser.add_argument('--seqlen', type=int, metavar='<int>', default=1200,
 	required=False, help='maximum sequence length [%(default)i]')
-parser.add_argument('--rnaseq', type=int, metavar='<int>', default=100000,
+parser.add_argument('--rnaseq', type=int, metavar='<int>', default=10000,
 	required=False, help='minimum RNAseq value [%(default)i]')
-parser.add_argument('--splices', type=int, metavar='<int>', default=3,
-	required=False, help='maximum number of splices per tx [%(default)i]')
 parser.add_argument('--ilen', type=int, metavar='<int>', default=35,
 	required=False, help='minimum intron length [%(default)i]')
 parser.add_argument('--elen', type=int, metavar='<int>', default=25,
@@ -178,7 +176,7 @@ for ff in glob.glob(f'{arg.genes}/*.fa'):
 	##########
 	# filter 8: too many isoforms
 	##########
-	isos = isoforms(ff, arg.splices, arg.ilen, arg.elen, arg.flank)
+	isos = isoforms(ff, arg.imax, arg.ilen, arg.elen, arg.flank)
 	if isos > arg.isoforms:
 		log['too_many_isoforms'] += 1
 		print('N', end='', file=sys.stderr)

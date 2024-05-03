@@ -3,10 +3,10 @@
     "multiple_genes": 4038,
     "no_introns": 796,
     "multiple_transcripts": 3831,
-    "poorly_expressed": 7503,
-    "non_canonical": 157,
-    "gene_too_long": 3103,
-    "too_many_introns": 26,
-    "too_many_isoforms": 283,
-    "kept_genes": 589
+    "poorly_expressed": 3759,
+    "non_canonical": 418,
+    "gene_too_long": 5876,
+    "too_many_introns": 62,
+    "too_many_isoforms": 501,
+    "kept_genes": 1045
 }
