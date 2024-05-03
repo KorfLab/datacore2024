@@ -43,4 +43,4 @@ Requires doing a C.elegans gene build with `--issuesok`. In the lines below,
 	tar -zcf apc.tar.gz apc
 	mv apc build
 
-The apc set for ws282 is ___ genes.
+The apc set for ws282 is 589 genes.
