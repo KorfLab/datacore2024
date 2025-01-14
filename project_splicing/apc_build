@@ -9,6 +9,7 @@ import subprocess
 import sys
 
 from grimoire.genome import Reader
+from isoform import Locus
 
 #######
 # CLI #
@@ -18,7 +19,7 @@ parser = argparse.ArgumentParser(
 	description='dataset builder for apc algorithm')
 parser.add_argument('genes', type=str, metavar='<genes dir>',
 	help='path to gene build directory')
-parser.add_argument('--seqlen', type=int, metavar='<int>', default=2000,
+parser.add_argument('--seqlen', type=int, metavar='<int>', default=1200,
 	required=False, help='maximum sequence length [%(default)i]')
 parser.add_argument('--rnaseq', type=int, metavar='<int>', default=10000,
 	required=False, help='minimum RNAseq value [%(default)i]')
@@ -26,29 +27,13 @@ parser.add_argument('--ilen', type=int, metavar='<int>', default=35,
 	required=False, help='minimum intron length [%(default)i]')
 parser.add_argument('--elen', type=int, metavar='<int>', default=25,
 	required=False, help='minimum exon length [%(default)i]')
-#parser.add_argument('--imax', type=int, metavar='<int>', default=3,
-#	required=False, help='maximum number of introns [%(default)i]')
 parser.add_argument('--flank', type=int, metavar='<int>', default=99,
 	required=False, help='genomic flank length [%(default)i]')
-parser.add_argument('--isoforms', type=int, metavar='<int>', default=10,
-	required=False, help='maximum number of isoforms in millions[%(default)i]')
-parser.add_argument('--program', type=str, metavar='<str>',
-	default='geniso2 --countonly', required=False,
-	help='isoform counting program [%(default)s]')
+parser.add_argument('--isoforms', type=float, metavar='<float>', default=10,
+	required=False, help='maximum number of isoforms in millions[%(default).1f]')
+parser.add_argument('--debug', action='store_true')
 arg = parser.parse_args()
 arg.isoforms *= 1000000
-
-#############
-# Functions #
-#############
-
-def isoforms(seq, maxs, minin, minex, flank):
-	stuff = subprocess.run([arg.program, seq, '--max_splice', str(maxs),
-		'--min_intron', str(minin), '--min_exon', str(minex),
-		'--flank', str(flank)], capture_output=True, text=True).stdout
-	f = stuff.split()
-	return int(f[1])
-
 
 ################
 # Output Files # they are named :(
@@ -61,15 +46,15 @@ lfh = open("apc.log.json", "w")
 # Main #
 ########
 
-gfh.write('# id\tlength\tintrons\tRNAseq\tisoforms\tstrand\n')
+print('# id\tlength\tintrons\tRNAseq\tisoforms', file=gfh, flush=True)
 
 log = {
 	'total_gene_regions': 0,
+	'region_too_long': 0,
 	'multiple_genes': 0,
 	'no_introns': 0,
 	'poorly_expressed': 0,
 	'non_canonical': 0,
-	'gene_too_long': 0,
 	'too_many_isoforms': 0,
 	'kept_genes': 0,
 }
@@ -80,9 +65,20 @@ for ff in glob.glob(f'{arg.genes}/*.fa'):
 	genome = Reader(gff=gf, fasta=ff)
 	chrom = next(genome) # there is only one in a pcg build
 	log['total_gene_regions'] += 1
+	
+	# debug
+	if arg.debug and log['kept_genes'] >= 20: break
 
 	##########
-	# filter 1: isolated genes
+	# filter 1: not too long
+	##########
+	if len(chrom.seq) > arg.seqlen:
+		log['region_too_long'] += 1
+		print('L', end='', file=sys.stderr, flush=True)
+		continue
+
+	##########
+	# filter 2: isolated protein-coding genes
 	##########
 	genes = len([None for f in chrom.ftable.features if f.type == 'gene'])
 	if genes > 1:
@@ -93,7 +89,7 @@ for ff in glob.glob(f'{arg.genes}/*.fa'):
 	gene = chrom.ftable.build_genes()[0] # the one true gene
 
 	##########
-	# filter 2: has intron
+	# filter 3: has introns
 	##########
 	max_introns = 0
 	for tx in gene.transcripts():
@@ -104,7 +100,7 @@ for ff in glob.glob(f'{arg.genes}/*.fa'):
 		continue
 
 	##########
-	# filter 3: plentiful splicing data matching the introns
+	# filter 4: plentiful splicing data matching the introns
 	##########
 	introns = {}
 	for tx in gene.transcripts():
@@ -123,7 +119,7 @@ for ff in glob.glob(f'{arg.genes}/*.fa'):
 		continue
 
 	##########
-	# filter 4: not weird (see grimoire defaults for gene build)
+	# filter 5: not weird (see grimoire defaults for gene build)
 	##########
 	weird = False
 	for tx in gene.transcripts():
@@ -136,31 +132,25 @@ for ff in glob.glob(f'{arg.genes}/*.fa'):
 		continue
 
 	##########
-	# filter 5: not too long
-	##########
-	if len(chrom.seq) > arg.seqlen:
-		log['gene_too_long'] += 1
-		print('L', end='', file=sys.stderr, flush=True)
-		continue
-
-	##########
 	# filter 6: not too many isoforms
 	##########
-	isos = isoforms(ff, arg.imax, arg.ilen, arg.elen, arg.flank)
-	if isos > arg.isoforms:
+	loc = Locus(chrom.name, chrom.seq, arg.ilen, arg.elen, arg.flank,
+		(None, None, None, None, None, None),
+		(None, None, None, None, None, None),
+		0, limit=int(arg.isoforms), countonly=True)
+	isos = loc.isocount
+	if isos >= arg.isoforms:
 		log['too_many_isoforms'] += 1
 		print('N', end='', file=sys.stderr, flush=True)
 		continue
-
+	
 	##########
 	# made it!
 	##########
 	log['kept_genes'] += 1
-	gfh.write(f'{chrom.name}\t{len(chrom.seq)}\t{len(tx.introns)}\t{maxexp}\t{isos}\t{gene.strand}\n')
-
-	# debug
-	#if debug > 999: break
-
-lfh.write(json.dumps(log, indent=4))
-
-
+	print('K', end='', file=sys.stderr, flush=True)
+	print('\t'.join((chrom.name, str(len(chrom.seq)), str(max_introns),
+		str(maxexp), str(isos))), file=gfh, flush=True)
+	
+print(file=sys.stderr, flush=True)
+print(json.dumps(log, indent=4), file=lfh)

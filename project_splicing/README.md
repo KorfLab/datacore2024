@@ -4,20 +4,23 @@ Splicing
 APC Build
 ---------
 
-+ Isolated protein-coding genes that do no overlap other genes
++ The region must be less than 1200 bp (99 flank on each side)
++ There must be a single protein-coding gene (no weird ovelaps)
 + The transcript must have an intron with at least 10,000 observations
 + The transcript may not have any non-canonical gene features
 	+ GT..AG introns only
 	+ Exons >= 25 bp
 	+ Introns >= 35 bp
-+ The primary transcript must be less than 2000 bp
-+ The gene must have less than 10 million (?) putative isoforms
++ The gene must have less than 1 million putative isoforms
+
+Might want to post-process to remove genes that are too similar to each other?
+
 
 Stuff you need
 
 + grimoire in your PYTHONPATH
 + grimoire's `haman` in your PATH
-+ isoforms's `geniso2` in your PATH
++ isoform in your PYTHONPATH
 
 Requires doing a C.elegans gene build with `--issuesok`. In the lines below,
 `$DATA` is wherever you keep your data.
