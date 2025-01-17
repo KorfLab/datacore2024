@@ -11,7 +11,7 @@ APC Build
 	+ GT..AG introns only
 	+ Exons >= 25 bp
 	+ Introns >= 35 bp
-+ The gene must have less than 1 million putative isoforms
++ The gene must have less than 10 million putative isoforms
 
 Might want to post-process to remove genes that are too similar to each other?
 
@@ -32,14 +32,10 @@ Requires doing a C.elegans gene build with `--issuesok`. In the lines below,
 	gunzip -c gff3.gz | grep -E "WormBase|RNASeq" > ws282.gff3
 	cd ..
 	haman build/genome.gz build/ws282.gff3 pcg genes --issuesok --plus
-	./apc_build genes
+	./apc_build build/genes
 
 2 new files: `apc.genes.txt` and `apc.log.json`
 
-	mkdir apc
-	mv genes build
-	perl gather.pl apc.genes.txt
-	tar -zcf apc.tar.gz apc
-	mv apc build
+The apc set for ws282 is 1063 genes.
 
-The apc set for ws282 is XXX genes.
+Need to do some other stuff next...
