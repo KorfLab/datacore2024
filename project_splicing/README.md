@@ -39,4 +39,8 @@ To remove paralogs that are too close and build the final set:
 
 	perl gene_reducer.pl
 
+This results in the `small_genes` directory, which has 1045 genes. The final
+step is to tar-ball it
+
+	tar -czf smallgenes.tar.gz smallgenes
 
