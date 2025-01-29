@@ -1,8 +1,8 @@
 Splicing
 ========
 
-APC Build
----------
+Build procedure for smallgenes
+------------------------------
 
 + The region must be less than 1200 bp (99 flank on each side)
 + There must be a single protein-coding gene (no weird ovelaps)
@@ -12,15 +12,14 @@ APC Build
 	+ Exons >= 25 bp
 	+ Introns >= 35 bp
 + The gene must have less than 10 million putative isoforms
-
-Might want to post-process to remove genes that are too similar to each other?
-
++ The locus must not be too similar to other loci (95% pct of 95% length)
 
 Stuff you need
 
 + grimoire in your PYTHONPATH
 + grimoire's `haman` in your PATH
 + isoform in your PYTHONPATH
++ blast in your PATH
 
 Requires doing a C.elegans gene build with `--issuesok`. In the lines below,
 `$DATA` is wherever you keep your data.
@@ -32,10 +31,12 @@ Requires doing a C.elegans gene build with `--issuesok`. In the lines below,
 	gunzip -c gff3.gz | grep -E "WormBase|RNASeq" > ws282.gff3
 	cd ..
 	haman build/genome.gz build/ws282.gff3 pcg genes --issuesok --plus
-	./apc_build build/genes
+	python3 gene_selector.py build/genes
 
-2 new files: `apc.genes.txt` and `apc.log.json`
+This results in 2 new file: `initial.genes.txt` and `initial.log.json`
 
-The apc set for ws282 is 1063 genes.
+To remove paralogs that are too close and build the final set:
 
-Need to do some other stuff next...
+	perl gene_reducer.pl
+
+

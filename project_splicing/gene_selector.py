@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import argparse
 import glob
 import json
@@ -16,7 +14,7 @@ from isoform import Locus
 #######
 
 parser = argparse.ArgumentParser(
-	description='dataset builder for apc algorithm')
+	description='initial gene selector for smallgenes')
 parser.add_argument('genes', type=str, metavar='<genes dir>',
 	help='path to gene build directory')
 parser.add_argument('--seqlen', type=int, metavar='<int>', default=1200,
@@ -39,8 +37,8 @@ arg.isoforms *= 1000000
 # Output Files # they are named :(
 ################
 
-gfh = open("apc.genes.txt", "w")
-lfh = open("apc.log.json", "w")
+gfh = open("initial.genes.txt", "w")
+lfh = open("initial.log.json", "w")
 
 ########
 # Main #
