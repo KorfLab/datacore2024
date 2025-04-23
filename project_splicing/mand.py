@@ -8,7 +8,6 @@ import subprocess
 import sys
 
 from grimoire.genome import Reader
-from isoform2 import Locus
 
 #######
 # CLI #
