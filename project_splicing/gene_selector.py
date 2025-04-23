@@ -7,7 +7,7 @@ import subprocess
 import sys
 
 from grimoire.genome import Reader
-from isoform import Locus
+from isoform2 import Locus
 
 #######
 # CLI #
@@ -63,7 +63,7 @@ for ff in glob.glob(f'{arg.genes}/*.fa'):
 	genome = Reader(gff=gf, fasta=ff)
 	chrom = next(genome) # there is only one in a pcg build
 	log['total_gene_regions'] += 1
-	
+
 	# debug
 	if arg.debug and log['kept_genes'] >= 20: break
 
@@ -141,7 +141,7 @@ for ff in glob.glob(f'{arg.genes}/*.fa'):
 		log['too_many_isoforms'] += 1
 		print('N', end='', file=sys.stderr, flush=True)
 		continue
-	
+
 	##########
 	# made it!
 	##########
@@ -149,6 +149,6 @@ for ff in glob.glob(f'{arg.genes}/*.fa'):
 	print('K', end='', file=sys.stderr, flush=True)
 	print('\t'.join((chrom.name, str(len(chrom.seq)), str(max_introns),
 		str(maxexp), str(isos))), file=gfh, flush=True)
-	
+
 print(file=sys.stderr, flush=True)
 print(json.dumps(log, indent=4), file=lfh)
